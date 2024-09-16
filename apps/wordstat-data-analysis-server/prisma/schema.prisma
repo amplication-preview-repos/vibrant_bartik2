@@ -1,0 +1,58 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Keyword {
+  createdAt     DateTime        @default(now())
+  id            String          @id @default(cuid())
+  keyword       String?
+  requests      Request[]
+  trendAnalyses TrendAnalysis[]
+  updatedAt     DateTime        @updatedAt
+}
+
+model TrendAnalysis {
+  analyzedAt DateTime?
+  createdAt  DateTime  @default(now())
+  id         String    @id @default(cuid())
+  keyword    Keyword?  @relation(fields: [keywordId], references: [id])
+  keywordId  String?
+  trendData  Json?
+  updatedAt  DateTime  @updatedAt
+}
+
+model SearchResult {
+  createdAt  DateTime @default(now())
+  id         String   @id @default(cuid())
+  request    Request? @relation(fields: [requestId], references: [id])
+  requestId  String?
+  resultData Json?
+  updatedAt  DateTime @updatedAt
+}
+
+model Request {
+  createdAt     DateTime       @default(now())
+  id            String         @id @default(cuid())
+  keyword       Keyword?       @relation(fields: [keywordId], references: [id])
+  keywordId     String?
+  requestedAt   DateTime?
+  searchResults SearchResult[]
+  updatedAt     DateTime       @updatedAt
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(cuid())
+  lastName  String?
+  password  String
+  roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
